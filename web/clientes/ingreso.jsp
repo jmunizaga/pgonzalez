@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -9,8 +10,12 @@
         <header>
             <h1>Ingreso de Clientes</h1>
         </header>
+        <%
+            if (request.getAttribute("respuesta") == null) {
+        %>
         <div>
-            <form action="clientes" method="POST">
+            <form action="../AdminClientes" method="POST">
+                <input type="text" name="accion" value="ingreso" hidden>
                 <table>
                     <tr>
                         <td>Rut</td><td><input type="text" name="rut" maxlength="10" required></td>
@@ -30,9 +35,17 @@
                 </table>
             </form>
         </div>
+        <%
+        } else {
+        %>
+        <h2><c:out value="${respuesta}"/></h2>
+        <%
+            }
+        %>
+
     </body>
     <br>
     <footer>
-            <a href="menu.jsp">Volver atrás</a>
+        <a href="./clientes/menu.jsp">Volver atrás</a>
     </footer>
 </html>

@@ -13,7 +13,7 @@
             <form action="clientes" method="POST">
                 <table>
                     <tr>
-                        <td>Rut</td><td><input type="text" name="rut" maxlength="10" disabled></td><td><button>Buscar cliente</button></td>
+                        <td>Rut</td><td><input type="text" name="rut" maxlength="10" required></td><td><button>Buscar cliente</button></td>
                     </tr>
                     <tr>
                         <td>Nombre</td><td><input type="text" name="nombre" maxlength="50" disabled></td>
