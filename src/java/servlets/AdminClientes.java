@@ -1,12 +1,9 @@
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.Vector;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,8 +33,7 @@ public class AdminClientes extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("pgonzalezPU");
+        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
 
         if (request.getParameterMap().containsKey("accion")) {
@@ -54,31 +50,58 @@ public class AdminClientes extends HttpServlet {
                 listarClientes(request, response, em);
             }
         }
+
     }
 
     private void ingresoCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
 
         Cliente cliente = formularioCliente(request);
-        String respuesta = insert(cliente, em);
+        insert(cliente, em);
+        //TODO devolver respueta
+        String respuesta = "test";
         request.setAttribute("respuesta", respuesta);
         request.getRequestDispatcher("/clientes/ingreso.jsp").forward(request, response);
+
     }
 
-    private void modificarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void modificarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws IOException, ServletException {
+        Cliente cliente = em.find(Cliente.class, leerRut(request));
+        Cliente data = formularioCliente(request);
+
+        cliente.setNombre(data.getNombre());
+        cliente.setDireccion(data.getDireccion());
+        cliente.setFono(data.getFono());
+        String respuesta = null;
+        try{
+           update(cliente, em);
+           respuesta = "exito";
+        }catch(Exception e){
+           respuesta = "error";
+        }
+        request.setAttribute("respuesta", respuesta);
+        request.getRequestDispatcher("/clientes/modificar.jsp").forward(request, response);
+
     }
 
-    private void eliminarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em) {
+    private void eliminarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws ServletException, IOException {
 
         Cliente cliente = em.find(Cliente.class, leerRut(request));
         delete(cliente, em);
+        //TODO
+        String respuesta = "test";
+        request.setAttribute("respuesta", respuesta);
+        request.getRequestDispatcher("/clientes/eliminar.jsp").forward(request, response);
+
     }
 
-    private void listarClientes(HttpServletRequest request, HttpServletResponse response, EntityManager em) 
+    private void listarClientes(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
 
-        TypedQuery<Cliente> consultaClientes = em.createNamedQuery("Cliente.findAll", Cliente.class);
+        TypedQuery<Cliente> consultaClientes = em.createNamedQuery("Cliente.findAll", Cliente.class
+        );
         //consultaClientes.setParameter("rut");
         List<Cliente> listaClientes = consultaClientes.getResultList();
 
@@ -99,29 +122,29 @@ public class AdminClientes extends HttpServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Metodos de manipulacion de base de datos.">
-    private String insert(Cliente cliente, EntityManager em) {
+    private void insert(Cliente cliente, EntityManager em) {
         try {
             em.getTransaction().begin();
             em.persist(cliente);
             em.getTransaction().commit();
+        } finally {
+            // Close the database connection:
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             em.close();
-            return "Ingreso Exitoso";
-        } catch (Exception e) {
-            return "Error ingresando Datos:" + e.toString();
         }
-
     }
 
     private void delete(Cliente cliente, EntityManager em) {
         em.getTransaction().begin();
         em.remove(cliente);
         em.getTransaction().commit();
-        em.close();
-
     }
 
     private void update(Cliente cliente, EntityManager em) {
-
+        em.getTransaction().begin();
+        em.getTransaction().commit();
     }//</editor-fold>
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods.">
 

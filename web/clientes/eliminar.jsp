@@ -10,7 +10,8 @@
             <h1>Eliminar Clientes</h1>
         </header>
         <div>
-            <form action="clientes" method="POST">
+            <form action="../AdminClientes" method="POST">
+                <input type="text" name="accion" value="eliminar" hidden>
                 <table>
                     <tr>
                         <td>Rut</td><td><input type="text" name="rut" maxlength="10" required></td><td><button>Buscar cliente</button></td>
@@ -33,6 +34,6 @@
     </body>
     <br>
     <footer>
-            <a href="menu.jsp">Volver atrás</a>
+        <a href="menu.jsp">Volver atrás</a>
     </footer>
 </html>

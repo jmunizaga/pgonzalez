@@ -10,10 +10,11 @@
             <h1>Modificar Clientes</h1>
         </header>
         <div>
-            <form action="clientes" method="POST">
+            <form action="../AdminClientes" method="POST">
+                <input type="text" name="accion" value="modificar" hidden>
                 <table>
                     <tr>
-                        <td>Rut</td><td><input type="text" name="rut" maxlength="10" disabled></td><td><button>Buscar cliente</button></td>
+                        <td>Rut</td><td><input type="text" name="rut" maxlength="10" ></td><td><button>Buscar cliente</button></td>
                     </tr>
                     <tr>
                         <td>Nombre</td><td><input type="text" name="nombre" maxlength="50" required=""></td>
@@ -25,7 +26,7 @@
                         <td>Fono</td><td><input type="number" name="fono" maxlength="9" required=""></td>
                     </tr>
                     <tr>
-                        <td><button>Modificar</button></td>
+                        <td><input type="submit" value="Modificar"></td>
                     </tr>
                 </table>
             </form>

@@ -35,17 +35,21 @@
                 </table>
             </form>
         </div>
+        <br>
+        <footer>
+            <a href="menu.jsp">Volver atrás</a>
+        </footer>
         <%
         } else {
         %>
         <h2><c:out value="${respuesta}"/></h2>
+        <footer>
+            <a href="clientes/menu.jsp">Volver atrás</a>
+        </footer>
         <%
             }
         %>
 
     </body>
-    <br>
-    <footer>
-        <a href="./clientes/menu.jsp">Volver atrás</a>
-    </footer>
+
 </html>
