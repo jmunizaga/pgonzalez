@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package servlets;
 
 import java.io.IOException;
@@ -9,9 +14,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import persistencia.Cliente;
+import persistencia.Raza;
 
-public class AdminClientes extends HttpServlet {
+public class AdminRazas extends HttpServlet {
+
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -30,53 +36,53 @@ public class AdminClientes extends HttpServlet {
 
         if (request.getParameterMap().containsKey("accion")) {
             if (request.getParameter("accion").equals("ingreso")) {
-                ingresoCliente(request, response, em);
+                ingresoRaza(request, response, em);
             }
             if (request.getParameter("accion").equals("modificar")) {
-                modificarCliente(request, response, em);
+                modificarRaza(request, response, em);
             }
             if (request.getParameter("accion").equals("eliminar")) {
-                eliminarCliente(request, response, em);
+                eliminarRaza(request, response, em);
             }
             if (request.getParameter("accion").equals("listar")) {
-                listarClientes(request, response, em);
+                listarRazas(request, response, em);
             }
         }
         if (request.getParameterMap().containsKey("buscar")) {
-            listarClientes(request, response, em);
+            listarRazas(request, response, em);
         }
     }
 
-    private void ingresoCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void ingresoRaza(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
-        Cliente cliente = formularioCliente(request);
+        Raza raza = formularioRaza(request);
         String respuesta;
         try {
-            insert(cliente, em);
-            respuesta = "Cliente Ingresado";
+            insert(raza, em);
+            respuesta = "Raza Ingresada";
         } catch (Exception e) {
-            respuesta = "Cliente existente o error al ingresar. Intente nuevamente";
+            respuesta = "Raza existente o error al ingresar. Intente nuevamente";
         }
         request.setAttribute("respuesta", respuesta);
-        request.getRequestDispatcher("/clientes/ingreso.jsp").forward(request, response);
+        request.getRequestDispatcher("/razas/ingreso.jsp").forward(request, response);
 
     }
 
-    private void modificarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void modificarRaza(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws IOException, ServletException {
         String respuesta = "";
-        Cliente cliente = em.find(Cliente.class, leerPrimaryKey(request));
-        if (cliente == null) {
-            respuesta = "Cliente no Existe";
+        Raza raza = em.find(Raza.class, leerPrimaryKey(request));
+        if (raza == null) {
+            respuesta = "Raza no Existe";
             request.setAttribute("respuesta", respuesta);
         } else {
-            Cliente data = formularioCliente(request);
+            Raza data = formularioRaza(request);
             if (data.getNombre().equals("")) {
-                request.setAttribute("cliente", cliente);
+                request.setAttribute("raza", raza);
             } else {
                 try {
-                    respuesta = "Cliente Actualizado";
-                    update(cliente, data, em);
+                    respuesta = "Raza Actualizada";
+                    update(raza, data, em);
                 } catch (Exception e) {
                     respuesta = "Error al actualizar. Intente nuevamente";
                 } finally {
@@ -85,26 +91,26 @@ public class AdminClientes extends HttpServlet {
             }
 
         }
-        request.getRequestDispatcher("/clientes/modificar.jsp").forward(request, response);
+        request.getRequestDispatcher("/razas/modificar.jsp").forward(request, response);
 
     }
 
-    private void eliminarCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void eliminarRaza(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
 
         String respuesta = "";
-        Cliente cliente = em.find(Cliente.class, leerPrimaryKey(request));
-        if (cliente == null) {
-            respuesta = "Cliente no Existe";
+        Raza raza = em.find(Raza.class, leerPrimaryKey(request));
+        if (raza == null) {
+            respuesta = "Raza no Existe";
             request.setAttribute("respuesta", respuesta);
         } else {
-            Cliente data = formularioCliente(request);
-            if (data.getNombre().equals("")) {
-                request.setAttribute("cliente", cliente);
+            Raza data = formularioRaza(request);
+            if (data.getDescripcion().equals("")) {
+                request.setAttribute("raza", raza);
             } else {
                 try {
-                    respuesta = "Cliente Eliminado";
-                    delete(cliente, em);
+                    respuesta = "Raza Eliminado";
+                    delete(raza, em);
                 } catch (Exception e) {
                     respuesta = "Error al eliminar. Intente nuevamente";
                 } finally {
@@ -113,47 +119,41 @@ public class AdminClientes extends HttpServlet {
             }
 
         }
-        request.getRequestDispatcher("/clientes/eliminar.jsp").forward(request, response);
+        request.getRequestDispatcher("/razas/eliminar.jsp").forward(request, response);
     }
 
-    private void listarClientes(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void listarRazas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
 
-        TypedQuery<Cliente> consultaClientes = em.createNamedQuery("Cliente.findAll", Cliente.class
+        TypedQuery<Raza> consultaRazas = em.createNamedQuery("Raza.findAll", Raza.class
         );
-        //consultaClientes.setParameter("rut");
-        List<Cliente> listaClientes = consultaClientes.getResultList();
+        //consultaRazas.setParameter("rut");
+        List<Raza> listaRazas = consultaRazas.getResultList();
 
-        request.setAttribute("listaClientes", listaClientes);
-        request.getRequestDispatcher("/clientes/listar.jsp").forward(request, response);
+        request.setAttribute("listaRazas", listaRazas);
+        request.getRequestDispatcher("/razas/listar.jsp").forward(request, response);
     }
 
-    private Cliente formularioCliente(HttpServletRequest request) {
-        String rut = request.getParameter("rut").trim();
-        String nombre;
-        String direccion;
-        String fono;
-        if (request.getParameterMap().containsKey("nombre")) {
-            nombre = request.getParameter("nombre").trim();
-            direccion = request.getParameter("direccion").trim();
-            fono = request.getParameter("fono").trim();
+    private Raza formularioRaza(HttpServletRequest request) {
+        String nombre = request.getParameter("nombre").trim();
+        String descripcion;
+        if (request.getParameterMap().containsKey("descripcion")) {
+            descripcion = request.getParameter("descripcion").trim();
         } else {
-            nombre = "";
-            direccion = "";
-            fono = "";
+            descripcion = "";
         }
-        return new Cliente(rut, nombre, direccion, fono);
+        return new Raza(nombre, descripcion);
     }
 
     private String leerPrimaryKey(HttpServletRequest request) {
-        return request.getParameter("rut").trim();
+        return request.getParameter("nombre").trim();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Metodos de manipulacion de base de datos.">
-    private void insert(Cliente cliente, EntityManager em) {
+    private void insert(Raza raza, EntityManager em) {
         try {
             em.getTransaction().begin();
-            em.persist(cliente);
+            em.persist(raza);
             em.getTransaction().commit();
         } finally {
             // Cerrar la conexion
@@ -164,10 +164,10 @@ public class AdminClientes extends HttpServlet {
         }
     }
 
-    private void delete(Cliente cliente, EntityManager em) {
+    private void delete(Raza raza, EntityManager em) {
         try {
             em.getTransaction().begin();
-            em.remove(cliente);
+            em.remove(raza);
             em.getTransaction().commit();
         } finally {
             // Cerrar la conexion
@@ -178,12 +178,11 @@ public class AdminClientes extends HttpServlet {
         }
     }
 
-    private void update(Cliente cliente, Cliente data, EntityManager em) {
+    private void update(Raza raza, Raza data, EntityManager em) {
         try {
             em.getTransaction().begin();
-            cliente.setNombre(data.getNombre());
-            cliente.setDireccion(data.getDireccion());
-            cliente.setFono(data.getFono());
+            raza.setNombre(data.getNombre());
+            raza.setDescripcion(data.getDescripcion());
             em.getTransaction().commit();
         } finally {
             // Cerrar la conexion

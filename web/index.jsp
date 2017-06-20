@@ -13,10 +13,11 @@
         </header>
         <div class="menu_principal">
             <a href="clientes/menu.jsp">clientes</a>
-            <a href="mascotas.jsp">mascotas</a>
-            <a href="fichas.jsp">fichas</a>
-            <a href="atenciones.jsp">atenciones</a>
-            <a href="veterinarios.jsp">veterinarios</a>
+            <a href="mascotas/menu.jsp">mascotas</a>
+            <a href="razas/menu.jsp">razas</a>
+            <a href="fichas/menu.jsp">fichas</a>
+            <a href="atenciones/menu.jsp">atenciones</a>
+            <a href="veterinarios/menu.jsp">veterinarios</a>
         </div>
     </body>
 </html>

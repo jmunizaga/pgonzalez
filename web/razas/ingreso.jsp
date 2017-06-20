@@ -4,30 +4,24 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Clientes - Ingreso</title>
+        <title>Razas - Ingreso</title>
     </head>
     <body>
         <header>
-            <h1>Ingreso de Clientes</h1>
+            <h1>Ingreso de Razas</h1>
         </header>
         <%
             if (request.getAttribute("respuesta") == null) {
         %>
         <div>
-            <form action="../AdminClientes" method="POST">
+            <form action="../AdminRazas" method="POST">
                 <input type="text" name="accion" value="ingreso" hidden>
                 <table>
                     <tr>
-                        <td>Rut</td><td><input type="text" name="rut" maxlength="10" required></td>
+                        <td>Nombre</td><td><input type="text" name="nombre" maxlength="10" required></td>
                     </tr>
                     <tr>
-                        <td>Nombre</td><td><input type="text" name="nombre" maxlength="50" required></td>
-                    </tr>
-                    <tr>
-                        <td>Dirección</td><td><input type="text" name="direccion" maxlength="50" required></td>
-                    </tr>
-                    <tr>
-                        <td>Fono</td><td><input type="number" name="fono" maxlength="9" required></td>
+                        <td>Descripción</td><td><input type="text" name="descripcion" maxlength="50" required></td>
                     </tr>
                     <tr>
                         <td><button>Ingresar</button></td>
@@ -44,7 +38,7 @@
         %>
         <h2><c:out value="${respuesta}"/></h2>
         <footer>
-            <a href="clientes/menu.jsp">Volver atrás</a>
+            <a href="razas/menu.jsp">Volver atrás</a>
         </footer>
         <%
             }
