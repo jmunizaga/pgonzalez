@@ -15,6 +15,7 @@
             <a href="ingreso.jsp">Ingreso</a>
             <a href="modificar.jsp">Modificar</a>
             <a href="eliminar.jsp">Eliminar</a>
+            <a href="busqueda.jsp">Búsqueda</a>
             <a href="listar.jsp">Listado</a>
         </div>
         <br>

@@ -53,7 +53,25 @@ public class AdminMascotas extends HttpServlet {
                 obtenerDatos(request, response, em);
 
             }
+            if (request.getParameter("accion").equals("buscar")) {
+                buscarMascotas(request, response, em);
+            }
         }
+    }
+     private void buscarMascotas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws ServletException, IOException {
+        
+        String respuesta = "";
+        Mascota mascota = em.find(Mascota.class, leerPrimaryKey(request));
+        if (mascota == null) {
+            respuesta = "Mascota no Existe";
+            request.setAttribute("respuesta", respuesta);
+        } else {
+             request.setAttribute("mascota", mascota);
+        }
+
+        
+        request.getRequestDispatcher("/mascotas/busqueda.jsp").forward(request, response);
     }
 
     private void ingresoMascota(HttpServletRequest request, HttpServletResponse response, EntityManager em)

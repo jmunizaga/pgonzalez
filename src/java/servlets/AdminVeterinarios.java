@@ -46,10 +46,27 @@ public class AdminVeterinarios extends HttpServlet {
             if (request.getParameter("accion").equals("listar")) {
                 listarVeterinarios(request, response, em);
             }
+            if (request.getParameter("accion").equals("buscar")) {
+                buscarVeterinarios(request, response, em);
+            }
         }
         if (request.getParameterMap().containsKey("buscar")) {
             listarVeterinarios(request, response, em);
         }
+    }
+    private void buscarVeterinarios(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws ServletException, IOException {
+
+        String respuesta = "";
+        Veterinario veterinario = em.find(Veterinario.class, leerPrimaryKey(request));
+        if (veterinario == null) {
+            respuesta = "Veterinario no Existe";
+            request.setAttribute("respuesta", respuesta);
+        } else {
+            request.setAttribute("veterinario", veterinario);
+        }
+
+        request.getRequestDispatcher("/veterinarios/busqueda.jsp").forward(request, response);
     }
 
     private void ingresoVeterinario(HttpServletRequest request, HttpServletResponse response, EntityManager em)

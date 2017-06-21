@@ -41,11 +41,26 @@ public class AdminClientes extends HttpServlet {
             if (request.getParameter("accion").equals("listar")) {
                 listarClientes(request, response, em);
             }
+            if (request.getParameter("accion").equals("buscar")) {
+                buscarClientes(request, response, em);
+            }
         }
-        //TODO
-//        if (request.getParameterMap().containsKey("buscar")) {
-//            listarClientes(request, response, em);
-//        }
+    }
+    
+     private void buscarClientes(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws ServletException, IOException {
+        
+        String respuesta = "";
+        Cliente cliente = em.find(Cliente.class, leerPrimaryKey(request));
+        if (cliente == null) {
+            respuesta = "Cliente no Existe";
+            request.setAttribute("respuesta", respuesta);
+        } else {
+             request.setAttribute("cliente", cliente);
+        }
+
+        
+        request.getRequestDispatcher("/clientes/busqueda.jsp").forward(request, response);
     }
 
     private void ingresoCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)

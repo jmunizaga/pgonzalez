@@ -48,6 +48,9 @@ public class AdminFichas extends HttpServlet {
             if (request.getParameter("accion").equals("listar")) {
                 listarFichas(request, response, em);
             }
+            if (request.getParameter("accion").equals("buscar")) {
+                buscarFichas(request, response, em);
+            }
             if (request.getParameter("accion").equals("obtenerMascotas")) {
                 obtenerMascotas(request, response, em);
             }
@@ -129,17 +132,18 @@ public class AdminFichas extends HttpServlet {
         request.setAttribute("listaMascotas", listaMascotas);
         request.getRequestDispatcher("/fichas/ingreso.jsp").forward(request, response);
     }
-
-    private void listarFichas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    
+    private void listarFichas(HttpServletRequest request, HttpServletResponse response, EntityManager em) 
             throws ServletException, IOException {
+        TypedQuery<Ficha> consultaFichas = em.createNamedQuery("Ficha.findAll", Ficha.class);
+        List<Ficha> listaFichas = consultaFichas.getResultList();
+        request.setAttribute("listaFichas", listaFichas);
+        request.getRequestDispatcher("/fichas/listar.jsp").forward(request, response);
+    }
 
-//        TypedQuery<Ficha> consultaFichas = em.createNamedQuery("Ficha.findAll", Ficha.class
-//        );
-//        //consultaFichas.setParameter("rut");
-//        List<Ficha> listaFichas = consultaFichas.getResultList();
-//
-//        request.setAttribute("listaFichas", listaFichas);
-//        request.getRequestDispatcher("/fichas/listar.jsp").forward(request, response);
+    private void buscarFichas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+            throws ServletException, IOException {
+        
         String respuesta = "";
         Ficha ficha = em.find(Ficha.class, leerPrimaryKey(request));
         if (ficha == null) {
@@ -150,7 +154,7 @@ public class AdminFichas extends HttpServlet {
         }
 
         
-        request.getRequestDispatcher("/fichas/listar.jsp").forward(request, response);
+        request.getRequestDispatcher("/fichas/busqueda.jsp").forward(request, response);
     }
 
     private Ficha formularioFicha(HttpServletRequest request) {
