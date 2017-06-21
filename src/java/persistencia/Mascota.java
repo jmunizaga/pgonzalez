@@ -86,6 +86,12 @@ public class Mascota implements Serializable {
         this.fechaNac = fechaNac;
         this.sexo = sexo;
     }
+    public Mascota(String nombre, Date fechaNac, String sexo) {
+        this.id = id;
+        this.nombre = nombre;
+        this.fechaNac = fechaNac;
+        this.sexo = sexo;
+    }
 
     public Integer getId() {
         return id;

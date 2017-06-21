@@ -1,6 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="persistencia.Veterinario"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -47,3 +46,4 @@
     <footer>
         <a href="menu.jsp">Volver atrás</a>
     </footer>
+</html>
