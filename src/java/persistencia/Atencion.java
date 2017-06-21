@@ -83,6 +83,12 @@ public class Atencion implements Serializable {
         this.fechaAtencion = fechaAtencion;
         this.diagnostico = diagnostico;
         this.tratamiento = tratamiento;
+        
+    }
+     public Atencion(Date fechaAtencion, String diagnostico, String tratamiento) {
+        this.fechaAtencion = fechaAtencion;
+        this.diagnostico = diagnostico;
+        this.tratamiento = tratamiento;
     }
 
     public Integer getId() {

@@ -24,6 +24,10 @@
         <servlet-name>AdminMascotas</servlet-name>
         <servlet-class>servlets.AdminMascotas</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminAtenciones</servlet-name>
+        <servlet-class>servlets.AdminAtenciones</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AdminClientes</servlet-name>
         <url-pattern>/AdminClientes</url-pattern>
@@ -43,6 +47,10 @@
     <servlet-mapping>
         <servlet-name>AdminMascotas</servlet-name>
         <url-pattern>/AdminMascotas</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminAtenciones</servlet-name>
+        <url-pattern>/AdminAtenciones</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
