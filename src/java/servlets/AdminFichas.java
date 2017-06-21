@@ -71,56 +71,55 @@ public class AdminFichas extends HttpServlet {
 
     private void modificarFicha(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws IOException, ServletException {
-//        String respuesta = "";
-//        Ficha ficha = em.find(Ficha.class, leerPrimaryKey(request));
-//        if (ficha == null) {
-//            respuesta = "Ficha no Existe";
-//            request.setAttribute("respuesta", respuesta);
-//        } else {
-//            Ficha data = formularioFicha(request);
-//            if (data.getNombre().equals("")) {
-//                request.setAttribute("ficha", ficha);
-//            } else {
-//                try {
-//                    respuesta = "Ficha Actualizado";
-//                    update(ficha, data, em);
-//                } catch (Exception e) {
-//                    respuesta = "Error al actualizar. Intente nuevamente";
-//                } finally {
-//                    request.setAttribute("respuesta", respuesta);
-//                }
-//            }
-//
-//        }
-//        request.getRequestDispatcher("/fichas/modificar.jsp").forward(request, response);
+        String respuesta = "";
+        Ficha ficha = em.find(Ficha.class, leerPrimaryKey(request));
+        if (ficha == null) {
+            respuesta = "Ficha no Existe";
+            request.setAttribute("respuesta", respuesta);
+        } else {
+            Ficha data = formularioFicha(request);
+            if (data.getTamaño()==-1) {
+                request.setAttribute("ficha", ficha);
+            } else {
+                try {
+                    respuesta = "Ficha Actualizado";
+                    update(ficha, data, em);
+                } catch (Exception e) {
+                    respuesta = "Error al actualizar. Intente nuevamente";
+                } finally {
+                    request.setAttribute("respuesta", respuesta);
+                }
+            }
+
+        }
+        request.getRequestDispatcher("/fichas/modificar.jsp").forward(request, response);
 
     }
 
     private void eliminarFicha(HttpServletRequest request, HttpServletResponse response, EntityManager em)
             throws ServletException, IOException {
 
-//        String respuesta = "";
-//        Ficha ficha = em.find(Ficha.class, leerPrimaryKey(request));
-//        if (ficha == null) {
-//            respuesta = "Ficha no Existe";
-//            request.setAttribute("respuesta", respuesta);
-//        } else {
-//            Ficha data = formularioFicha(request);
-//            if (data.getNombre().equals("")) {
-//                request.setAttribute("ficha", ficha);
-//            } else {
-//                try {
-//                    respuesta = "Ficha Eliminado";
-//                    delete(ficha, em);
-//                } catch (Exception e) {
-//                    respuesta = "Error al eliminar. Intente nuevamente";
-//                } finally {
-//                    request.setAttribute("respuesta", respuesta);
-//                }
-//            }
-//
-//        }
-//        request.getRequestDispatcher("/fichas/eliminar.jsp").forward(request, response);
+        String respuesta = "";
+        Ficha ficha = em.find(Ficha.class, leerPrimaryKey(request));
+        if (ficha == null) {
+            respuesta = "Ficha no Existe";
+            request.setAttribute("respuesta", respuesta);
+        } else {
+            if (!request.getParameterMap().containsKey("peso")) {
+                request.setAttribute("ficha", ficha);
+            } else {
+                try {
+                    respuesta = "Ficha Eliminado";
+                    delete(ficha, em);
+                } catch (Exception e) {
+                    respuesta = "Error al eliminar. Intente nuevamente";
+                } finally {
+                    request.setAttribute("respuesta", respuesta);
+                }
+            }
+
+        }
+        request.getRequestDispatcher("/fichas/eliminar.jsp").forward(request, response);
     }
 
     private void obtenerMascotas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
@@ -152,6 +151,7 @@ public class AdminFichas extends HttpServlet {
         int tamaño;
         int mascota_id_FK;
         if (request.getParameterMap().containsKey("peso")) {
+            //TODO devolver valor de fecha ajustado
             fechaCreacion = Date.valueOf(request.getParameter("fecha_creacion").trim());
             peso = Float.parseFloat(request.getParameter("peso").trim());
             tamaño = Integer.parseInt(request.getParameter("tamano").trim());
@@ -168,8 +168,8 @@ public class AdminFichas extends HttpServlet {
         return ficha;
     }
 
-    private String leerPrimaryKey(HttpServletRequest request) {
-        return request.getParameter("id").trim();
+    private int leerPrimaryKey(HttpServletRequest request) {
+        return Integer.parseInt(request.getParameter("id").trim());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Metodos de manipulacion de base de datos.">
@@ -204,19 +204,19 @@ public class AdminFichas extends HttpServlet {
     }
 
     private void update(Ficha ficha, Ficha data, EntityManager em) {
-//        try {
-//            em.getTransaction().begin();
-//            ficha.setNombre(data.getNombre());
-//            ficha.setDireccion(data.getDireccion());
-//            ficha.setFono(data.getFono());
-//            em.getTransaction().commit();
-//        } finally {
-//            // Cerrar la conexion
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            em.close();
-//        }
+        try {
+            em.getTransaction().begin();
+            ficha.setFechaCreacion(data.getFechaCreacion());
+            ficha.setPeso(data.getPeso());
+            ficha.setTamaño(data.getTamaño());
+            em.getTransaction().commit();
+        } finally {
+            // Cerrar la conexion
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }//</editor-fold>
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods.">
 
