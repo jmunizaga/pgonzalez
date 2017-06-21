@@ -3,12 +3,12 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Veterinaria - Menú Veterinarios</title>
+        <title>Veterinaria - Menú Fichas</title>
         <link rel="stylesheet" type="text/css" href="../resources/css/main.css">
     </head>
     <body>
         <header>
-            <h1>Veterinarios</h1>
+            <h1>Fichas</h1>
             <p>Menú Principal</p>
         </header>
         <div class="menu_principal">

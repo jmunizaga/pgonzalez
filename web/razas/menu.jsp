@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Veterinaria - Menú Clientes</title>
+        <title>Veterinaria - Menú Razas</title>
         <link rel="stylesheet" type="text/css" href="../resources/css/main.css">
     </head>
     <body>

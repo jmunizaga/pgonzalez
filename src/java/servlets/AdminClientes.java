@@ -42,9 +42,10 @@ public class AdminClientes extends HttpServlet {
                 listarClientes(request, response, em);
             }
         }
-        if (request.getParameterMap().containsKey("buscar")) {
-            listarClientes(request, response, em);
-        }
+        //TODO
+//        if (request.getParameterMap().containsKey("buscar")) {
+//            listarClientes(request, response, em);
+//        }
     }
 
     private void ingresoCliente(HttpServletRequest request, HttpServletResponse response, EntityManager em)

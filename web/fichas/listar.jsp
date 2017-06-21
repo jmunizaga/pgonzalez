@@ -1,42 +1,46 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="persistencia.Veterinario"%>
+<%@page import="persistencia.Cliente"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Veterinarios - Listado</title>
+        <title>Clientes - Listado</title>
         <link rel="stylesheet" type="text/css" href="../resources/css/main.css">
     </head>
     <body>
         <%
-            if (request.getAttribute("listaVeterinarios") == null) {
+            if (request.getAttribute("listaClientes") == null) {
         %>
-        <jsp:forward page="../AdminVeterinarios?accion=listar" />
+        <jsp:forward page="../AdminClientes?accion=listar" />
         <%
             }
         %>
 
         <header>
-            <h1>Listado de Veterinarios</h1>
+            <h1>Listado de Clientes</h1>
         </header>
         <div class="lista">
             <table>
                 <thead>
                 <td>Rut</td>
                 <td>Nombre</td>
+                <td>Dirección</td>
                 <td>Fono</td>
                 </thead>
-                <c:forEach items="${listaVeterinarios}" var="veterinario">
+                <c:forEach items="${listaClientes}" var="cliente">
                     <tr>
                         <td>
-                            <c:out value="${veterinario.getRut()}"/>
+                            <c:out value="${cliente.getRut()}"/>
                         </td>
                         <td>
-                            <c:out value="${veterinario.getNombre()}"/>
+                            <c:out value="${cliente.getNombre()}"/>
                         </td>
                         <td>
-                            <c:out value="${veterinario.getFono()}"/>
+                            <c:out value="${cliente.getDireccion()}"/>
+                        </td> 
+                        <td>
+                            <c:out value="${cliente.getFono()}"/>
                         </td>    
                     </tr>
                 </c:forEach>

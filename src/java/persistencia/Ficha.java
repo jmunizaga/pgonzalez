@@ -80,6 +80,12 @@ public class Ficha implements Serializable {
         this.peso = peso;
         this.tamaño = tamaño;
     }
+    
+    public Ficha(Date fechaCreacion, float peso, int tamaño) {
+        this.fechaCreacion = fechaCreacion;
+        this.peso = peso;
+        this.tamaño = tamaño;
+    }
 
     public Integer getId() {
         return id;

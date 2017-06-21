@@ -16,6 +16,10 @@
         <servlet-name>AdminRazas</servlet-name>
         <servlet-class>servlets.AdminRazas</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminFichas</servlet-name>
+        <servlet-class>servlets.AdminFichas</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AdminClientes</servlet-name>
         <url-pattern>/AdminClientes</url-pattern>
@@ -27,6 +31,10 @@
     <servlet-mapping>
         <servlet-name>AdminRazas</servlet-name>
         <url-pattern>/AdminRazas</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminFichas</servlet-name>
+        <url-pattern>/AdminFichas</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
