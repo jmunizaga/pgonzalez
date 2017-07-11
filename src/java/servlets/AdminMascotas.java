@@ -46,7 +46,6 @@ public class AdminMascotas extends HttpServlet {
             }
             if (request.getParameter("accion").equals("obtenerDatos")) {
                 obtenerDatos(request, response, em);
-
             }
             if (request.getParameter("accion").equals("buscar")) {
                 buscarMascotas(request, response, em);
