@@ -1,151 +1,101 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.List;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import persistencia.Veterinario;
+import persistencia.dao.VeterinarioDAO;
 
 public class AdminVeterinarios extends HttpServlet {
 
-  /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    VeterinarioDAO veterinarioDAO;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        EntityManager em = emf.createEntityManager();
+        veterinarioDAO = new VeterinarioDAO((EntityManagerFactory) getServletContext().getAttribute("emf"));
 
         if (request.getParameterMap().containsKey("accion")) {
-            if (request.getParameter("accion").equals("ingreso")) {
-                ingresoVeterinario(request, response, em);
+            String user_action = request.getParameter("accion");
+            if (user_action.equals("ingreso")) {
+                ingresoVeterinario(request, response);
             }
-            if (request.getParameter("accion").equals("modificar")) {
-                modificarVeterinario(request, response, em);
+            if (user_action.equals("modificar")) {
+                modificarVeterinario(request, response);
             }
-            if (request.getParameter("accion").equals("eliminar")) {
-                eliminarVeterinario(request, response, em);
+            if (user_action.equals("eliminar")) {
+                eliminarVeterinario(request, response);
             }
-            if (request.getParameter("accion").equals("listar")) {
-                listarVeterinarios(request, response, em);
+            if (user_action.equals("listar")) {
+                listarVeterinarios(request, response);
             }
-            if (request.getParameter("accion").equals("buscar")) {
-                buscarVeterinarios(request, response, em);
+            if (user_action.equals("buscar")) {
+                buscarVeterinarios(request, response);
             }
         }
         if (request.getParameterMap().containsKey("buscar")) {
-            listarVeterinarios(request, response, em);
+            listarVeterinarios(request, response);
         }
     }
-    private void buscarVeterinarios(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+
+    private void buscarVeterinarios(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String respuesta = "";
-        Veterinario veterinario = em.find(Veterinario.class, leerPrimaryKey(request));
+        Veterinario veterinario = veterinarioDAO.buscar(request.getParameter("rut"));
         if (veterinario == null) {
-            respuesta = "Veterinario no Existe";
-            request.setAttribute("respuesta", respuesta);
+            request.setAttribute("respuesta", "Veterinario no existe");
         } else {
             request.setAttribute("veterinario", veterinario);
         }
-
         request.getRequestDispatcher("/veterinarios/busqueda.jsp").forward(request, response);
     }
 
-    private void ingresoVeterinario(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void ingresoVeterinario(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Veterinario veterinario = formularioVeterinario(request);
-        String respuesta;
-        try {
-            insert(veterinario, em);
-            respuesta = "Veterinario Ingresado";
-        } catch (Exception e) {
-            respuesta = "Veterinario existente o error al ingresar. Intente nuevamente";
-        }
-        request.setAttribute("respuesta", respuesta);
+        Veterinario veterinario = getVeterinarioFormulario(request);
+        request.setAttribute("respuesta", veterinarioDAO.insert(veterinario));
         request.getRequestDispatcher("/veterinarios/ingreso.jsp").forward(request, response);
 
     }
 
-    private void modificarVeterinario(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void modificarVeterinario(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        String respuesta = "";
-        Veterinario veterinario = em.find(Veterinario.class, leerPrimaryKey(request));
-        if (veterinario == null) {
-            respuesta = "Veterinario no Existe";
-            request.setAttribute("respuesta", respuesta);
+        Veterinario target = veterinarioDAO.buscar(request.getParameter("rut"));
+        if (target == null) {
+            request.setAttribute("respuesta", "Veterinario no existe");
+        } else if (request.getParameterMap().containsKey("nombre")) {
+            request.setAttribute("respuesta", veterinarioDAO.update(target, getVeterinarioFormulario(request)));
         } else {
-            Veterinario data = formularioVeterinario(request);
-            if (data.getNombre().equals("")) {
-                request.setAttribute("veterinario", veterinario);
-            } else {
-                try {
-                    respuesta = "Veterinario Actualizado";
-                    update(veterinario, data, em);
-                } catch (Exception e) {
-                    respuesta = "Error al actualizar. Intente nuevamente";
-                } finally {
-                    request.setAttribute("respuesta", respuesta);
-                }
-            }
-
+            request.setAttribute("veterinario", target);
         }
         request.getRequestDispatcher("/veterinarios/modificar.jsp").forward(request, response);
-
     }
 
-    private void eliminarVeterinario(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void eliminarVeterinario(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String respuesta = "";
-        Veterinario veterinario = em.find(Veterinario.class, leerPrimaryKey(request));
+        Veterinario veterinario = veterinarioDAO.buscar(request.getParameter("rut"));
         if (veterinario == null) {
-            respuesta = "Veterinario no Existe";
-            request.setAttribute("respuesta", respuesta);
+            request.setAttribute("respuesta", "Veterinario no Existe");
+        } else if (request.getParameterMap().containsKey("nombre")) {
+            request.setAttribute("respuesta", veterinarioDAO.delete(veterinario));
         } else {
-            Veterinario data = formularioVeterinario(request);
-            if (data.getNombre().equals("")) {
-                request.setAttribute("veterinario", veterinario);
-            } else {
-                try {
-                    respuesta = "Veterinario Eliminado";
-                    delete(veterinario, em);
-                } catch (Exception e) {
-                    respuesta = "Error al eliminar. Intente nuevamente";
-                } finally {
-                    request.setAttribute("respuesta", respuesta);
-                }
-            }
-
+            request.setAttribute("veterinario", veterinario);
         }
         request.getRequestDispatcher("/veterinarios/eliminar.jsp").forward(request, response);
     }
 
-    private void listarVeterinarios(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void listarVeterinarios(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        TypedQuery<Veterinario> consultaVeterinarios = em.createNamedQuery("Veterinario.findAll", Veterinario.class
-        );
-        //consultaVeterinarios.setParameter("rut");
-        List<Veterinario> listaVeterinarios = consultaVeterinarios.getResultList();
-
-        request.setAttribute("listaVeterinarios", listaVeterinarios);
+        request.setAttribute("listaVeterinarios", veterinarioDAO.selectAll());
         request.getRequestDispatcher("/veterinarios/listar.jsp").forward(request, response);
     }
 
-    private Veterinario formularioVeterinario(HttpServletRequest request) {
+    private Veterinario getVeterinarioFormulario(HttpServletRequest request) {
         String rut = request.getParameter("rut").trim();
         String nombre;
         String fono;
@@ -159,55 +109,7 @@ public class AdminVeterinarios extends HttpServlet {
         return new Veterinario(rut, nombre, fono);
     }
 
-    private String leerPrimaryKey(HttpServletRequest request) {
-        return request.getParameter("rut").trim();
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="Metodos de manipulacion de base de datos.">
-    private void insert(Veterinario veterinario, EntityManager em) {
-        try {
-            em.getTransaction().begin();
-            em.persist(veterinario);
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }
-
-    private void delete(Veterinario veterinario, EntityManager em) {
-        try {
-            em.getTransaction().begin();
-            em.remove(veterinario);
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }
-
-    private void update(Veterinario veterinario, Veterinario data, EntityManager em) {
-        try {
-            em.getTransaction().begin();
-            veterinario.setNombre(data.getNombre());
-            veterinario.setFono(data.getFono());
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }//</editor-fold>
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods.">
-
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -245,5 +147,4 @@ public class AdminVeterinarios extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

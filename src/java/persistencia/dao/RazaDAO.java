@@ -54,18 +54,17 @@ public class RazaDAO extends AbstractDAO {
     }
     
     private void update_db(Raza target, Raza data) {
-//        try {
-//            em.getTransaction().begin();
-//            target.setNombre(data.getNombre());
-//            target.setDireccion(data.getDireccion());
-//            target.setFono(data.getFono());
-//            em.getTransaction().commit();
-//        } finally {
-//            // Cerrar la conexion
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            em.close();
-//        }
+        try {
+            em.getTransaction().begin();
+            target.setNombre(data.getNombre());
+            target.setDescripcion(data.getDescripcion());
+            em.getTransaction().commit();
+        } finally {
+            // Cerrar la conexion
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }
 }

@@ -36,10 +36,10 @@
                     <input type="text" name="accion" value="modificar" hidden>
                     <table>
                         <tr>
-                            <td>Nombre</td><td><input type="text" name="nombre" maxlength="10" readonly value="${raza.getRut()}" ></td>
+                            <td>Nombre</td><td><input type="text" name="nombre" maxlength="10" readonly value="${raza.getNombre()}" ></td>
                         </tr>
                         <tr>
-                            <td>Descripción</td><td><input type="text" name="descripcion" maxlength="50" required value="${raza.getNombre()}"></td>
+                            <td>Descripción</td><td><input type="text" name="descripcion" maxlength="50" required value="${raza.getDescripcion()}"></td>
                         </tr>
                         <tr>
                             <td><input type="submit" value="Modificar"></td>

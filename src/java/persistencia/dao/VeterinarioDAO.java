@@ -54,18 +54,17 @@ public class VeterinarioDAO extends AbstractDAO {
     }
     
     private void update_db(Veterinario target, Veterinario data) {
-//        try {
-//            em.getTransaction().begin();
-//            target.setNombre(data.getNombre());
-//            target.setDireccion(data.getDireccion());
-//            target.setFono(data.getFono());
-//            em.getTransaction().commit();
-//        } finally {
-//            // Cerrar la conexion
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            em.close();
-//        }
+        try {
+            em.getTransaction().begin();
+            target.setNombre(data.getNombre());
+            target.setFono(data.getFono());
+            em.getTransaction().commit();
+        } finally {
+            // Cerrar la conexion
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
+        }
     }
 }
