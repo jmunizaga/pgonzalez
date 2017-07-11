@@ -2,10 +2,7 @@ package servlets;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.List;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,157 +10,113 @@ import javax.servlet.http.HttpServletResponse;
 import persistencia.Cliente;
 import persistencia.Mascota;
 import persistencia.Raza;
+import persistencia.dao.ClienteDAO;
+import persistencia.dao.MascotaDAO;
+import persistencia.dao.RazaDAO;
 
 public class AdminMascotas extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    MascotaDAO mascotaDAO;
+    ClienteDAO clienteDAO;
+    RazaDAO razaDAO;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
         EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        EntityManager em = emf.createEntityManager();
+        mascotaDAO = new MascotaDAO(emf);
+        clienteDAO = new ClienteDAO(emf);
+        razaDAO = new RazaDAO(emf);
 
         if (request.getParameterMap().containsKey("accion")) {
-            if (request.getParameter("accion").equals("ingreso")) {
-                ingresoMascota(request, response, em);
+            String user_action = request.getParameter("accion");
+            if (user_action.equals("ingreso")) {
+                ingresoMascota(request, response);
             }
-            if (request.getParameter("accion").equals("modificar")) {
-                modificarMascota(request, response, em);
+            if (user_action.equals("modificar")) {
+                modificarMascota(request, response);
             }
-            if (request.getParameter("accion").equals("eliminar")) {
-                eliminarMascota(request, response, em);
+            if (user_action.equals("eliminar")) {
+                eliminarMascota(request, response);
             }
-            if (request.getParameter("accion").equals("listar")) {
-                listarMascotas(request, response, em);
+            if (user_action.equals("listar")) {
+                listarMascotas(request, response);
             }
-            if (request.getParameter("accion").equals("obtenerDatos")) {
-                obtenerDatos(request, response, em);
+            if (user_action.equals("obtenerDatos")) {
+                obtenerDatos(request, response);
             }
-            if (request.getParameter("accion").equals("buscar")) {
-                buscarMascotas(request, response, em);
+            if (user_action.equals("buscar")) {
+                buscarMascotas(request, response);
             }
+
         }
     }
-     private void buscarMascotas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
-            throws ServletException, IOException {
-        
-        String respuesta = "";
-        Mascota mascota = em.find(Mascota.class, leerPrimaryKey(request));
-        if (mascota == null) {
-            respuesta = "Mascota no Existe";
-            request.setAttribute("respuesta", respuesta);
-        } else {
-             request.setAttribute("mascota", mascota);
-        }
 
-        
+    private void buscarMascotas(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        Mascota mascota = mascotaDAO.buscar(request.getParameter("id"));
+        if (mascota == null) {
+            request.setAttribute("respuesta", "Mascota no existe");
+        } else {
+            request.setAttribute("mascota", mascota);
+        }
         request.getRequestDispatcher("/mascotas/busqueda.jsp").forward(request, response);
     }
 
-    private void ingresoMascota(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void ingresoMascota(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Mascota mascota = formularioMascota(request);
-        String respuesta;
-        try {
-            insert(mascota, em);
-            respuesta = "Mascota Ingresado";
-        } catch (Exception e) {
-            respuesta = "Mascota existente o error al ingresar. Intente nuevamente";
-        }
-        request.setAttribute("respuesta", respuesta);
+        Mascota mascota = getMascotaFormulario(request);
+        mascota.setClienterutFK(clienteDAO.buscar(mascota.getClienterutFK().getRut()));
+        mascota.setRazanombreFK(razaDAO.buscar(mascota.getRazanombreFK().getNombre()));
+        request.setAttribute("respuesta", mascotaDAO.insert(mascota));
         request.getRequestDispatcher("/mascotas/ingreso.jsp").forward(request, response);
 
     }
 
-    private void modificarMascota(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void modificarMascota(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        String respuesta = "";
-        Mascota mascota = em.find(Mascota.class, leerPrimaryKey(request));
-        if (mascota == null) {
-            respuesta = "Mascota no Existe";
-            request.setAttribute("respuesta", respuesta);
+        Mascota target = mascotaDAO.buscar(request.getParameter("id"));
+        if (target == null) {
+            request.setAttribute("respuesta", "Mascota no existe");
+        } else if (request.getParameterMap().containsKey("nombre")) {
+            request.setAttribute("respuesta", mascotaDAO.update(target, getMascotaFormulario(request)));
         } else {
-            Mascota data = formularioMascota(request);
-            if (data.getNombre() == null) {
-                request.setAttribute("mascota", mascota);
-            } else {
-                try {
-                    respuesta = "Mascota Actualizada";
-                    update(mascota, data, em);
-                } catch (Exception e) {
-                    respuesta = "Error al actualizar. Intente nuevamente";
-                } finally {
-                    request.setAttribute("respuesta", respuesta);
-                }
-            }
-
+            request.setAttribute("mascota", target);
         }
         request.getRequestDispatcher("/mascotas/modificar.jsp").forward(request, response);
-
     }
 
-    private void eliminarMascota(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void eliminarMascota(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String respuesta = "";
-        Mascota mascota = em.find(Mascota.class, leerPrimaryKey(request));
+        Mascota mascota = mascotaDAO.buscar(request.getParameter("id"));
         if (mascota == null) {
-            respuesta = "Mascota no Existe";
-            request.setAttribute("respuesta", respuesta);
-        } else if (!request.getParameterMap().containsKey("peso")) {
-            request.setAttribute("mascota", mascota);
+            request.setAttribute("respuesta", "Mascota no Existe");
+        } else if (request.getParameterMap().containsKey("nombre")) {
+            request.setAttribute("respuesta", mascotaDAO.delete(mascota));
         } else {
-            try {
-                respuesta = "Mascota Eliminado";
-                delete(mascota, em);
-            } catch (Exception e) {
-                respuesta = "Error al eliminar. Intente nuevamente";
-            } finally {
-                request.setAttribute("respuesta", respuesta);
-            }
+            request.setAttribute("mascota", mascota);
         }
         request.getRequestDispatcher("/mascotas/eliminar.jsp").forward(request, response);
     }
 
-    private void obtenerDatos(HttpServletRequest request, HttpServletResponse response, EntityManager em)
+    private void listarMascotas(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        obtenerClientes(request, em);
-        obtenerRazas(request, em);
+        request.setAttribute("listaMascotas", mascotaDAO.selectAll());
+        request.getRequestDispatcher("/mascotas/listar.jsp").forward(request, response);
+    }
+
+    private void obtenerDatos(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("listaClientes", clienteDAO.selectAll());
+        request.setAttribute("listaRazas", razaDAO.selectAll());
         request.getRequestDispatcher("/mascotas/ingreso.jsp").forward(request, response);
 
     }
 
-    private void obtenerClientes(HttpServletRequest request, EntityManager em) {
-        TypedQuery<Cliente> consultaCliente = em.createNamedQuery("Cliente.findAll", Cliente.class);
-        List<Cliente> listaClientes = consultaCliente.getResultList();
-        request.setAttribute("listaClientes", listaClientes);
-    }
-
-    private void obtenerRazas(HttpServletRequest request, EntityManager em) {
-        TypedQuery<Raza> consultaRaza = em.createNamedQuery("Raza.findAll", Raza.class);
-        List<Raza> listaRazas = consultaRaza.getResultList();
-        request.setAttribute("listaRazas", listaRazas);
-    }
-
-    private void listarMascotas(HttpServletRequest request, HttpServletResponse response, EntityManager em)
-            throws ServletException, IOException {
-
-        TypedQuery<Mascota> consultaMascotas = em.createNamedQuery("Mascota.findAll", Mascota.class);
-        List<Mascota> listaMascotas = consultaMascotas.getResultList();
-
-        request.setAttribute("listaMascotas", listaMascotas);
-        request.getRequestDispatcher("/mascotas/listar.jsp").forward(request, response);
-    }
-
-    private Mascota formularioMascota(HttpServletRequest request) {
+    private Mascota getMascotaFormulario(HttpServletRequest request) {
         Date fechaNac;
         String sexo;
         String nombre;
@@ -191,60 +144,6 @@ public class AdminMascotas extends HttpServlet {
         return mascota;
     }
 
-    private int leerPrimaryKey(HttpServletRequest request) {
-        return Integer.parseInt(request.getParameter("id").trim());
-    }
-
-    //<editor-fold defaultstate="collapsed" desc="Metodos de manipulacion de base de datos.">
-    
-    private void insert(Mascota mascota, EntityManager em) {
-        Cliente clienteFK = mascota.getClienterutFK();
-        Raza razaFK = mascota.getRazanombreFK();
-        mascota.setClienterutFK(em.find(Cliente.class, clienteFK.getRut()));
-        mascota.setRazanombreFK(em.find(Raza.class, razaFK.getNombre()));
-        try {
-            em.getTransaction().begin();
-            em.persist(mascota);
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }
-
-    private void delete(Mascota mascota, EntityManager em) {
-        try {
-            em.getTransaction().begin();
-            em.remove(mascota);
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }
-
-    private void update(Mascota mascota, Mascota data, EntityManager em) {
-        try {
-            em.getTransaction().begin();
-            mascota.setNombre(data.getNombre());
-            mascota.setFechaNac(data.getFechaNac());
-            mascota.setSexo(data.getSexo());
-            em.getTransaction().commit();
-        } finally {
-            // Cerrar la conexion
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            em.close();
-        }
-    }// </editor-fold>
-    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -283,5 +182,4 @@ public class AdminMascotas extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

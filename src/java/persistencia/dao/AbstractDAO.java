@@ -1,4 +1,4 @@
-package persistencia;
+package persistencia.dao;
 
 import java.util.List;
 import javax.persistence.EntityManager;

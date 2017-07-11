@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import persistencia.Cliente;
-import persistencia.ClienteDAO;
+import persistencia.dao.ClienteDAO;
 
 public class AdminClientes extends HttpServlet {
 
@@ -15,9 +15,9 @@ public class AdminClientes extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         response.setContentType("text/html;charset=UTF-8");
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        clienteDAO = new ClienteDAO(emf);
+        clienteDAO = new ClienteDAO((EntityManagerFactory) getServletContext().getAttribute("emf"));
 
         if (request.getParameterMap().containsKey("accion")) {
             String user_action = request.getParameter("accion");
@@ -33,9 +33,9 @@ public class AdminClientes extends HttpServlet {
             if (user_action.equals("listar")) {
                 listarClientes(request, response);
             }
-//            if (user_action.equals("buscar")) {
-//                buscarClientes(request, response, em);
-//            }
+            if (user_action.equals("buscar")) {
+                buscarClientes(request, response);
+            }
 
         }
     }
@@ -47,7 +47,7 @@ public class AdminClientes extends HttpServlet {
         if (cliente == null) {
             request.setAttribute("respuesta", "Cliente no existe");
         } else {
-            request.setAttribute("cliente",getClienteFormulario(request));
+            request.setAttribute("cliente",cliente);
         }
         request.getRequestDispatcher("/clientes/busqueda.jsp").forward(request, response);
     }
